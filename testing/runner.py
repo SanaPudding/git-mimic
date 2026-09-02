@@ -90,12 +90,11 @@ faulty TEST.in files."""
 DIRECTORY_LAYOUT_ERROR = """\
 Your {} folder is not where we expected it. Please ensure that your directory
 structure matches the following:
-\\library-su19
-\\proj2
-    \\gitlet
+git-mimic
+    src/main/java/gitlet
         Main.java
         ...
-    \\testing
+    testing
         runner.py
         ..."""
 
@@ -417,7 +416,7 @@ if __name__ == "__main__":
     verbose = False
     superverbose = False
     src_dir = 'src'
-    gitlet_dir = join(dirname(abspath(getcwd())), "gitlet")
+    gitlet_dir = join(dirname(abspath(getcwd())), "src", "main", "java", "gitlet")
     output_tolerance = 3
 
     try:
@@ -455,25 +454,20 @@ if __name__ == "__main__":
         print(USAGE)
         sys.exit(0)
 
-    if not isdir(lib_dir):
-        print(DIRECTORY_LAYOUT_ERROR.format("lib"))
-        sys.exit(1)
-    elif not isdir(gitlet_dir):
+    if not isdir(gitlet_dir):
         print(DIRECTORY_LAYOUT_ERROR.format("gitlet"))
         sys.exit(1)
 
-    lib_glob = join(lib_dir, "*")
+    classpath_parts = [abspath(getcwd())]
+    if isdir(lib_dir):
+        classpath_parts.append(join(lib_dir, "*"))
+    if 'CLASSPATH' in environ:
+        classpath_parts.append(environ['CLASSPATH'])
+
     ON_WINDOWS = Match(r'.*\\', join('a', 'b'))
-    if ON_WINDOWS:
-        if ('CLASSPATH' in environ):
-            environ['CLASSPATH'] = "{};{};{}".format(abspath(getcwd()), lib_glob, environ['CLASSPATH'])
-        else:
-            environ['CLASSPATH'] = "{};{}".format(abspath(getcwd()), lib_glob)
-    else:
-        if ('CLASSPATH' in environ):
-            environ['CLASSPATH'] = "{}:{}:{}".format(abspath(getcwd()), lib_glob, environ['CLASSPATH'])
-        else:
-            environ['CLASSPATH'] = "{}:{}".format(abspath(getcwd()), lib_glob)
+    sep = ";" if ON_WINDOWS else ":"
+    environ['CLASSPATH'] = sep.join(classpath_parts)
+    if not ON_WINDOWS:
         JAVA_COMMAND = 'exec ' + JAVA_COMMAND
         JAVAC_COMMAND = 'exec ' + JAVAC_COMMAND
 

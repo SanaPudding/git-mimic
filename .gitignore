@@ -1,0 +1,20 @@
+# Compiled class files
+*.class
+out/
+target/
+
+# Local Gitlet repositories created while running the program
+.gitlet/
+
+# Test runner scratch directories
+testing/**/*.dir
+testing/gitlet/
+__pycache__/
+*.pyc
+
+# IDE / OS
+.idea/
+.vscode/
+.cursor/
+*.iml
+.DS_Store
